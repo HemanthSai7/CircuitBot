@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::after,
+      *::before {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-family: "Poppins", Verdana, Geneva, Tahoma, sans-serif;
+      }
+
+      .btn {
+        font-family: inherit;
+        cursor: pointer;
+      }
+
+      input {
+        outline: none !important;
+        font-family: inherit;
+        padding: 0.3em;
+        font-size: 1rem;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        height: 100vh;
+      }
+
+      .box {
+        box-shadow: 0 0 14px #ddd;
+        max-width: 26rem;
+        padding: 1.8em;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        text-align: center; /* Center text in the box */
+      }
+
+      .form-control {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .form-control img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 0.5em; /* Adjusted margin for spacing */
+        border-radius: 50%;
+        object-fit: cover;
+        display: block; /* Center the image */
+        margin-left: auto; /* Center the image */
+        margin-right: auto; /* Center the image */
+      }
+
+      .circuit-bot-text {
+        color: #87cefa; /* Brighter light sky blue text color */
+        font-weight: bold; /* Optional: make the text bold */
+      }
+
+      .welcome-text {
+        color: #87cefa; /* Brighter light sky blue for the welcome text */
+        margin-top: 0.5em; /* Space above the text */
+        font-size: 0.9rem; /* Slightly smaller font size */
+      }
+
+      .btn {
+        padding: 0.4em 1.2em;
+        border: 0;
+        background: rgb(8, 194, 207);
+        color: #fff;
+        border-radius: 5px;
+        font-weight: 500;
+      }
+
+      .btn:hover {
+        background: rgb(7, 177, 189);
+      }
+
+      #info-box {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <form class="box" id="myFormId">
+        <div class="form-control">
+          <img src="/icon.png" alt="User Icon" />
+          <div class="circuit-bot-text">Circuit Bot</div> <!-- Added text below image -->
+          <div class="welcome-text">Hi, I am Circuit Bot. Enter your name to continue.</div> <!-- Welcome message -->
+        </div>
+
+        <div class="form-control">
+          <input
+            type="text"
+            id="User Name"
+            name="User Name"
+            required
+            minlength="1"
+            autocomplete="off"
+            placeholder="Your Name"/>
+        </div>
+
+        <input type="submit" value="Submit" class="btn" />
+      </form>
+      <div class="box" id="info-box" style="text-align: center">
+        <div>
+          <h1 class="info-icon">&#9989;</h1>
+          <h2 class="info-text">Success</h2>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const myFormId = document.getElementById("myFormId");
+      const wifiname = document.getElementById("User Name");
+      const infoBox = document.getElementById("info-box");
+
+      myFormId.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        console.log(data);
+        myFormId.style.display = "none";
+
+        infoBox.style.display = "block";
+        try {
+          fetch("/submit_button", {
+            method: "POST",
+            body: JSON.stringify({
+              wifiname: wifiname.value,
+            }),
+          })
+            .then((res) => {
+              console.log(res);
+              return res.json();
+            })
+            .then((data) => {
+              console.log(data);
+              alert(data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    </script>
+  </body>
+</html>
+ 

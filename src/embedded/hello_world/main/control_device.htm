@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        .device-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px; /* Add some space below the device buttons */
+        }
+        .device-button, .go-home-button {
+            margin: 10px;
+            padding: 15px 30px; /* Added padding for better appearance */
+            background-color: #007bff;
+            color: white; /* Set font color to white */
+            border: none;
+            border-radius: 50px; /* Make buttons round */
+            cursor: pointer;
+            font-size: 1rem; /* Set font size */
+            transition: background-color 0.3s; /* Add transition for smooth hover effect */
+        }
+        .device-button:hover, .go-home-button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+        .icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px; /* Adjust size as necessary */
+            height: auto; /* Maintain aspect ratio */
+        }
+    </style>
+</head>
+<body>
+    <img src="/icon.png" alt="User Icon" class="icon" />
+    <h1>Device Control</h1>
+    <div class="device-buttons" id="deviceButtons">
+        <!-- Device buttons will be appended here -->
+    </div>
+
+    <!-- Go to Home Button -->
+    <div style="text-align: center;">
+        <button class="go-home-button" id="goHome">Go to Home</button>
+    </div>
+
+    <script>
+        // Fetch device actions from the ESP32 server
+        async function fetchDevices() {
+            try {
+                const response = await fetch('/get_details', { method: 'POST' });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const devices = await response.json();
+                displayDeviceButtons(devices);
+            } catch (error) {
+                console.error('Error fetching devices:', error);
+            }
+        }
+
+        // Display device buttons based on the fetched JSON
+        function displayDeviceButtons(devices) {
+            const deviceButtonsDiv = document.getElementById('deviceButtons');
+            devices.forEach(device => {
+                const button = document.createElement('button');
+                button.className = 'device-button';
+
+                // Ensure the keys match the JSON structure
+                button.innerText = `${device.deviceName} - ${device.deviceAction}`;
+                button.onclick = () => controlDevice(
+                    device.deviceName, 
+                    device.deviceAction, 
+                    device.deviceAddress, 
+                    device.deviceCommand
+                );
+                deviceButtonsDiv.appendChild(button);
+            });
+        }
+
+        // Function to control the device
+        async function controlDevice(name, action, address, command) {
+            try {
+                const response = await fetch(`/control_action`, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        deviceName: name, 
+                        deviceAction: action,
+                        deviceAddress: address,
+                        deviceCommand: command
+                    }),
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+                const result = await response.json();
+                alert(`Action ${action} executed for ${name}. Address: ${address}, Command: ${command}. Status: ${result.status}`);
+            } catch (error) {
+                console.error('Error controlling device:', error);
+            }
+        }
+
+        // Handle "Go to Home" button click
+        document.getElementById("goHome").addEventListener("click", () => {
+            window.location.href = "/"; // Redirect to home page
+        });
+
+        // Fetch devices on page load
+        window.onload = fetchDevices;
+    </script>
+</body>
+</html>

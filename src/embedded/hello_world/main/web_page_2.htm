@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Circuit Bot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-family: "Poppins", Verdana, Geneva, Tahoma, sans-serif;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        background-color: #f8f9fa;
+      }
+
+      .box {
+        box-shadow: 0 0 14px #ddd;
+        max-width: 26rem;
+        padding: 1.8em;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        text-align: center;
+      }
+
+      .form-control img {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 0.5em;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .circuit-bot-text {
+        color: #5c9dc8;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+      }
+
+      .welcome-text {
+        color: #5c9dc8;
+        font-size: 1rem;
+        margin-bottom: 1em;
+      }
+
+      .btn {
+        padding: 0.4em 1.2em;
+        border: none;
+        background: rgb(8, 194, 207);
+        color: #fff;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+        margin: 0.2em 0; /* Added margin for better spacing */
+      }
+
+      .btn:hover {
+        background: rgb(7, 177, 189);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box" id="content">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+
+    <script>
+      // Fetch the stored name from NVS on page load
+      async function checkStoredName() {
+        try {
+          const response = await fetch("/add_device"); // Adjust this endpoint to match your API
+          const result = await response.json();
+          console.log("Fetched data:", result); // Log fetched data
+          if (result.name) {
+            showWelcomePage(result.name); // If name exists, show welcome page
+          } else {
+            showDefaultPage(); // Show default message if no name found
+          }
+        } catch (error) {
+          console.error("Error fetching name:", error);
+          showDefaultPage(); // Show default page on error
+        }
+      }
+
+      // Function to show the welcome message with the user's name
+      function showWelcomePage(name) {
+        document.getElementById("content").innerHTML = `
+          <div class="form-control">
+            <img src="/icon.png" alt="User Icon" />
+            <div class="circuit-bot-text">Circuit Bot</div>
+            <div class="welcome-text">Hi, ${name}, welcome! I am Circuit Bot. You can call me CB. How may I assist you today?</div>
+            <button class="btn" id="addDeviceBtn">Add Device</button>
+            <button class="btn" id="controlDeviceBtn">Control Device</button>
+          </div>`;
+
+        // Event listener for the Add Device button
+        document.getElementById("addDeviceBtn").addEventListener("click", () => {
+          window.location.href = "/add_device"; // Navigate to the Add Device page
+        });
+
+        // Event listener for the Control Device button
+        document.getElementById("controlDeviceBtn").addEventListener("click", () => {
+          alert("Controlling device..."); // Replace this with actual functionality
+        });
+      }
+
+      // Function to show a default message if no name is stored
+      function showDefaultPage() {
+        document.getElementById("content").innerHTML = `
+          <div class="form-control">
+            <img src="/icon.png" alt="User Icon" />
+            <div class="circuit-bot-text">Circuit Bot</div>
+            <div class="welcome-text">Hi, I am Circuit Bot. You can call me CB. How may I assist you today?</div>
+            <button class="btn" id="addDeviceBtn">Add Device</button>
+            <button class="btn" id="controlDeviceBtn">Control Device</button>
+          </div>`;
+
+        // Event listener for the Add Device button
+        document.getElementById("addDeviceBtn").addEventListener("click", () => {
+          window.location.href = "/add_device"; // Navigate to the Add Device page
+        });
+
+        // Event listener for the Control Device button
+        document.getElementById("controlDeviceBtn").addEventListener("click", () => {
+          // alert("Controlling device..."); // Replace this with actual functionality
+          window.location.href = "/control_device"; // Navigate to the Add Device page
+        });
+      }
+
+      // Initialize the page after the DOM content is fully loaded
+      document.addEventListener("DOMContentLoaded", checkStoredName);
+    </script>
+  </body>
+</html>

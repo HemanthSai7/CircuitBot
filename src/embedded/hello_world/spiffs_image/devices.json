@@ -1,0 +1,19 @@
+[{
+    "deviceName":	"J Default",
+    "deviceAction":	"B default",
+    "deviceCommand":	63240,
+    "deviceAddress":	64260
+},
+{
+    "deviceName":	"light",
+    "deviceAction":	"off",
+    "deviceCommand":	60945,
+    "deviceAddress":	64260
+
+},
+{
+    "deviceName": "light",
+    "deviceAction": "on",
+    "deviceCommand": 60690,
+    "deviceAddress": 64260
+}]

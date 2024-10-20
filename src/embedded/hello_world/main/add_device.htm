@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Device - Circuit Bot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-family: "Poppins", Verdana, Geneva, Tahoma, sans-serif;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        background-color: #f8f9fa;
+        position: relative;
+      }
+
+      .box {
+        box-shadow: 0 0 14px #ddd;
+        max-width: 26rem;
+        padding: 2em;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+
+      .circuit-bot-text {
+        color: #5c9dc8;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+      }
+
+      .input-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+      }
+
+      .input-field input {
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+      }
+
+      .btn {
+        padding: 0.4em 1.2em;
+        border: none;
+        background: rgb(8, 194, 207);
+        color: #fff;
+        border-radius: 5px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background: rgb(7, 177, 189);
+      }
+
+      .buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="/icon.png" alt="User Icon" class="icon" />
+    <div class="box">
+      <div class="circuit-bot-text">Add Device</div>
+
+      <!-- Device Form -->
+      <form id="deviceForm">
+        <div class="input-field">
+          <label for="deviceName">Device Name:</label>
+          <input type="text" id="deviceName" placeholder="Enter device name" required />
+        </div>
+        <div class="input-field">
+          <label for="deviceAction">Device Action:</label>
+          <input type="text" id="deviceAction" placeholder="Enter device action" required />
+        </div>
+        <button class="btn" type="submit">Start Search for Packet</button>
+      </form>
+
+      <!-- Information Box -->
+      <div id="infoBox" class="hidden">
+        <p>Searching for the device...</p>
+      </div>
+
+      <!-- Result Box -->
+      <div id="resultBox" class="hidden">
+        <p id="resultMessage"></p>
+        <div class="buttons-container">
+          <button id="goHome" class="btn">Go to Home</button>
+          <button id="addAnother" class="btn">Add Another Device</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const deviceForm = document.getElementById("deviceForm");
+      const infoBox = document.getElementById("infoBox");
+      const resultBox = document.getElementById("resultBox");
+      const resultMessage = document.getElementById("resultMessage");
+      const goHomeButton = document.getElementById("goHome");
+      const addAnotherButton = document.getElementById("addAnother");
+
+      // Handle form submission
+      deviceForm.addEventListener("submit", (e) => {
+        e.preventDefault(); // Prevent page reload
+
+        const deviceName = document.getElementById("deviceName").value;
+        const deviceAction = document.getElementById("deviceAction").value;
+
+        // Hide the form and show the loading message
+        deviceForm.classList.add("hidden");
+        infoBox.classList.remove("hidden");
+
+        // Send the request to the ESP32 server
+        fetch("/search_device", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ deviceName, deviceAction }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            infoBox.classList.add("hidden"); // Hide loading message
+
+            if (data.result === 1) {
+              resultMessage.textContent = "Device added successfully!";
+
+              // Post to /submit_add_device after success
+              return fetch("/submit_add_device", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ deviceName, deviceAction }),
+              });
+            } else {
+              resultMessage.textContent = "Device search failed. Please try again.";
+            }
+          })
+          .then(() => {
+            resultBox.classList.remove("hidden"); // Show result box with buttons
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again.");
+            deviceForm.classList.remove("hidden"); // Show form again on error
+            infoBox.classList.add("hidden");
+          });
+      });
+
+      // Handle "Go to Home" button click
+      goHomeButton.addEventListener("click", () => {
+        window.location.href = "/"; // Redirect to home page
+      });
+
+      // Handle "Add Another Device" button click
+      addAnotherButton.addEventListener("click", () => {
+        resultBox.classList.add("hidden"); // Hide result box
+        deviceForm.reset(); // Reset form fields
+        deviceForm.classList.remove("hidden"); // Show form again
+      });
+    </script>
+  </body>
+</html>

@@ -24,4 +24,5 @@ $ python detect_from_microphone.py --chunk_size 3000 --model_path models/dnn_cir
 
 # Images
 - Model JSON Response aka tool calling output 
+![Project Setup](assets/setup.jpg)
 ![CircuitBot](assets/tool_Call.png)
